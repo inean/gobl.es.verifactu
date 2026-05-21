@@ -4,8 +4,6 @@ go 1.24.0
 
 // replace github.com/invopop/gobl => ../gobl
 
-// replace github.com/invopop/xmldsig => ../xmldsig
-
 require (
 	github.com/go-resty/resty/v2 v2.15.3
 	github.com/invopop/gobl v0.403.0
@@ -45,3 +43,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	software.sslmate.com/src/go-pkcs12 v0.7.0 // indirect
 )
+
+replace github.com/invopop/xmldsig => github.com/inean/xmldsig v0.14.1-0.20260521203716-88f379b4634a
