@@ -3,8 +3,8 @@ package verifactu
 import (
 	"time"
 
+	"github.com/inean/xmldsig"
 	"github.com/invopop/gobl/bill"
-	"github.com/invopop/xmldsig"
 	"github.com/nbio/xml"
 )
 

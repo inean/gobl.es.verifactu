@@ -3,7 +3,7 @@ package noverifactu_test
 import (
 	"testing"
 
-	noverifactu "github.com/invopop/gobl.verifactu/pkg/noverifactu"
+	noverifactu "github.com/inean/gobl.verifactu/pkg/noverifactu"
 	"github.com/invopop/gobl/cal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/inean/xmldsig"
 	"github.com/invopop/gobl/addons/es/verifactu"
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/gobl/cbc"
@@ -13,7 +14,6 @@ import (
 	"github.com/invopop/gobl/org"
 	"github.com/invopop/gobl/tax"
 	"github.com/invopop/validation"
-	"github.com/invopop/xmldsig"
 	"github.com/nbio/xml"
 )
 

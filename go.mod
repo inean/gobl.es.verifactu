@@ -1,16 +1,14 @@
-module github.com/invopop/gobl.verifactu
+module github.com/inean/gobl.verifactu
 
 go 1.24.0
 
 // replace github.com/invopop/gobl => ../gobl
 
-// replace github.com/invopop/xmldsig => ../xmldsig
-
 require (
 	github.com/go-resty/resty/v2 v2.15.3
+	github.com/inean/xmldsig v0.14.1-0.20260521210322-f9513dd9bd45
 	github.com/invopop/gobl v0.403.0
 	github.com/invopop/validation v0.8.0
-	github.com/invopop/xmldsig v0.14.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lestrrat-go/libxml2 v0.0.0-20260304224138-bb3877930cf7
 	github.com/magefile/mage v1.15.0

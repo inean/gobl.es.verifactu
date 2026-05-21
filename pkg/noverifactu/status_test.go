@@ -3,7 +3,7 @@ package noverifactu_test
 import (
 	"testing"
 
-	noverifactu "github.com/invopop/gobl.verifactu/pkg/noverifactu"
+	noverifactu "github.com/inean/gobl.verifactu/pkg/noverifactu"
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/gobl/cbc"
 	"github.com/invopop/gobl/org"

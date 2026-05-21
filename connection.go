@@ -10,7 +10,7 @@ import (
 	"strconv"
 
 	"github.com/go-resty/resty/v2"
-	"github.com/invopop/xmldsig"
+	"github.com/inean/xmldsig"
 )
 
 // Environment defines the environment to use for connections

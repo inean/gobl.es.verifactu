@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"time"
 
+	noverifactu "github.com/inean/gobl.verifactu/pkg/noverifactu"
+	"github.com/inean/xmldsig"
 	"github.com/invopop/gobl"
-	noverifactu "github.com/invopop/gobl.verifactu/pkg/noverifactu"
 	"github.com/invopop/gobl/addons/es/verifactu"
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/gobl/cbc"
 	"github.com/invopop/gobl/head"
 	"github.com/invopop/gobl/l10n"
 	"github.com/invopop/gobl/org"
-	"github.com/invopop/xmldsig"
 )
 
 const (
@@ -30,6 +30,8 @@ type Client struct {
 	rep      *Issuer
 	curTime  time.Time
 	cert     *xmldsig.Certificate
+	certDER  []byte
+	keyDER   []byte
 	conn     *connection
 	withSeal bool
 	signing  bool
@@ -39,11 +41,20 @@ type Client struct {
 // Option is used to configure the client.
 type Option func(*Client)
 
-// WithCertificate defines the signing certificate to use when producing the
-// VeriFactu document.
+// WithCertificate defines the certificate to use for XML signatures and TLS
+// authentication.
 func WithCertificate(cert *xmldsig.Certificate) Option {
 	return func(c *Client) {
 		c.cert = cert
+	}
+}
+
+// WithCertificateDER defines the DER-encoded certificate and private key to use
+// for XML signatures and TLS authentication.
+func WithCertificateDER(certificateDER, privateKeyDER []byte) Option {
+	return func(c *Client) {
+		c.certDER = certificateDER
+		c.keyDER = privateKeyDER
 	}
 }
 
@@ -110,6 +121,14 @@ func New(software Software, opts ...Option) (*Client, error) {
 
 	for _, opt := range opts {
 		opt(c)
+	}
+
+	if len(c.certDER) > 0 || len(c.keyDER) > 0 {
+		var err error
+		c.cert, err = xmldsig.LoadCertificateFromDER(c.certDER, c.keyDER)
+		if err != nil {
+			return nil, ErrValidation.WithMessage(fmt.Errorf("preparing DER certificate: %v", err).Error())
+		}
 	}
 
 	if c.cert == nil {
