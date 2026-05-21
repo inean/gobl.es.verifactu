@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"time"
 
+	noverifactu "github.com/inean/gobl.verifactu/pkg/noverifactu"
+	"github.com/inean/xmldsig"
 	"github.com/invopop/gobl"
-	noverifactu "github.com/invopop/gobl.verifactu/pkg/noverifactu"
 	"github.com/invopop/gobl/addons/es/verifactu"
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/gobl/cbc"
 	"github.com/invopop/gobl/head"
 	"github.com/invopop/gobl/l10n"
 	"github.com/invopop/gobl/org"
-	"github.com/invopop/xmldsig"
 )
 
 const (
@@ -125,7 +125,7 @@ func New(software Software, opts ...Option) (*Client, error) {
 
 	if len(c.certDER) > 0 || len(c.keyDER) > 0 {
 		var err error
-		c.cert, err = certificateFromDER(c.certDER, c.keyDER)
+		c.cert, err = xmldsig.LoadCertificateFromDER(c.certDER, c.keyDER)
 		if err != nil {
 			return nil, ErrValidation.WithMessage(fmt.Errorf("preparing DER certificate: %v", err).Error())
 		}

@@ -1,4 +1,4 @@
-module github.com/invopop/gobl.verifactu
+module github.com/inean/gobl.verifactu
 
 go 1.24.0
 
@@ -6,9 +6,9 @@ go 1.24.0
 
 require (
 	github.com/go-resty/resty/v2 v2.15.3
+	github.com/inean/xmldsig v0.14.1-0.20260521210322-f9513dd9bd45
 	github.com/invopop/gobl v0.403.0
 	github.com/invopop/validation v0.8.0
-	github.com/invopop/xmldsig v0.14.0
 	github.com/joho/godotenv v1.5.1
 	github.com/lestrrat-go/libxml2 v0.0.0-20260304224138-bb3877930cf7
 	github.com/magefile/mage v1.15.0
@@ -43,5 +43,3 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	software.sslmate.com/src/go-pkcs12 v0.7.0 // indirect
 )
-
-replace github.com/invopop/xmldsig => github.com/inean/xmldsig v0.14.1-0.20260521203716-88f379b4634a

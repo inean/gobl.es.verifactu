@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"time"
 
-	noverifactu "github.com/invopop/gobl.verifactu/pkg/noverifactu"
+	noverifactu "github.com/inean/gobl.verifactu/pkg/noverifactu"
+	"github.com/inean/xmldsig"
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/gobl/cbc"
 	"github.com/invopop/gobl/org"
-	"github.com/invopop/xmldsig"
 	"github.com/nbio/xml"
 )
 

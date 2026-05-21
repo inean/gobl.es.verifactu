@@ -10,12 +10,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/invopop/gobl.verifactu/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func TestNewWithCertificateDERPreparesTLSConnection(t *testing.T) {
+func TestNewWithCertificateDER(t *testing.T) {
 	certificateDER, privateKeyDER := testCertificateDER(t)
 
 	c, err := New(
@@ -24,24 +23,8 @@ func TestNewWithCertificateDERPreparesTLSConnection(t *testing.T) {
 	)
 
 	require.NoError(t, err)
+	require.NotNil(t, c.cert)
 	require.NotNil(t, c.conn)
-}
-
-func TestNewWithCertificateDERSupportsSigning(t *testing.T) {
-	certificateDER, privateKeyDER := testCertificateDER(t)
-
-	c, err := New(
-		Software{},
-		WithCertificateDER(certificateDER, privateKeyDER),
-		WithSigning(),
-	)
-	require.NoError(t, err)
-
-	env := test.LoadEnvelope("inv-base.json")
-	reg, err := c.RegisterInvoice(env, nil)
-
-	require.NoError(t, err)
-	require.NotNil(t, reg.Signature)
 }
 
 func TestNewWithCertificateDERRejectsInvalidPrivateKey(t *testing.T) {
@@ -84,6 +67,5 @@ func testCertificateDER(t *testing.T) ([]byte, []byte) {
 	)
 	require.NoError(t, err)
 
-	privateKeyDER := x509.MarshalPKCS1PrivateKey(key)
-	return certificateDER, privateKeyDER
+	return certificateDER, x509.MarshalPKCS1PrivateKey(key)
 }

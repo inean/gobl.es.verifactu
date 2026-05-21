@@ -4,8 +4,8 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	"github.com/invopop/xmldsig"
-	"github.com/invopop/xmldsig/profiles/verifactu"
+	"github.com/inean/xmldsig"
+	"github.com/inean/xmldsig/profiles/verifactu"
 )
 
 // SignDocument signs any XML-marshalable struct using the VeriFactu XAdES

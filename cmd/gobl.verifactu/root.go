@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	verifactu "github.com/invopop/gobl.verifactu"
+	verifactu "github.com/inean/gobl.verifactu"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
