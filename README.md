@@ -188,11 +188,13 @@ func main() {
 
 ### Command Line
 
-The GOBL VeriFactu package tool also includes a command line helper. You can install manually in your Go environment with:
+Build the VERI*FACTU executable from this checkout:
 
 ```bash
-go install github.com/invopop/gobl.es.verifactu/cmd/gobl.verifactu@latest
+go build -o gobl.es.verifactu ./cmd/gobl.verifactu
 ```
+
+Compliance invokes `gobl.es.verifactu gateway` with a GOBL envelope on stdin.
 
 We recommend using a `.env` file to prepare configuration settings, although all parameters can be set using command line flags. Heres an example:
 
@@ -211,7 +213,7 @@ CERTIFICATE_PASSWORD=xxxxxxxxx
 To convert a document to XML, run:
 
 ```bash
-gobl.verifactu convert ./test/data/sample-invoice.json
+./gobl.es.verifactu convert ./test/data/sample-invoice.json
 ```
 
 This function will output the XML to the terminal, or to a file if a second argument is provided. The output file will not include a fingerprint, and therefore will not be able to be submitted to the tax agency.
@@ -219,7 +221,7 @@ This function will output the XML to the terminal, or to a file if a second argu
 To submit to the tax agency testing environment:
 
 ```bash
-gobl.verifactu send ./test/data/sample-invoice.json ./test/data/previous-invoice-info.json
+./gobl.es.verifactu send ./test/data/sample-invoice.json ./test/data/previous-invoice-info.json
 ```
 
 Now, the output file will include a fingerprint, linked to the previous document, and will be submitted to the tax agency. An example for a previous file would look like this:

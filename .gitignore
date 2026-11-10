@@ -27,6 +27,7 @@ go.work.sum
 *.txt
 
 /gobl.verifactu
+/gobl.es.verifactu
 
 # Certificates and private keys. Real certificates are used for testing
 # against the AEAT, and must never be committed. The generated test.p12

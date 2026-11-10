@@ -14,7 +14,7 @@ import (
 
 // build data provided by goreleaser and mage setup
 var (
-	name    = "gobl.verifactu"
+	name    = "gobl.es.verifactu"
 	version = "dev"
 	date    = ""
 )
