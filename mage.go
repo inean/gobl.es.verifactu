@@ -5,6 +5,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -13,32 +14,60 @@ import (
 )
 
 const (
-	name       = "gobl.verifactu"
+	name       = "gobl.es.verifactu"
 	mainBranch = "main"
 )
 
 // Build the binary
 func Build() error {
-	changed, err := target.Dir("./"+name, ".")
+	output, err := executable()
+	if err != nil {
+		return err
+	}
+	changed, err := target.Dir(output, ".")
 	if os.IsNotExist(err) || (err == nil && changed) {
-		return build("build")
+		return build(output)
 	}
 	return nil
 }
 
 // Install the binary into your go bin path
 func Install() error {
-	return build("install")
+	bin, err := trimOutput("go", "env", "GOBIN")
+	if err != nil {
+		return err
+	}
+	if bin == "" {
+		gopath, err := trimOutput("go", "env", "GOPATH")
+		if err != nil {
+			return err
+		}
+		paths := filepath.SplitList(gopath)
+		if len(paths) == 0 {
+			return fmt.Errorf("GOBIN and GOPATH are empty")
+		}
+		bin = filepath.Join(paths[0], "bin")
+	}
+	output, err := executable()
+	if err != nil {
+		return err
+	}
+	return build(filepath.Join(bin, output))
 }
 
-func build(action string) error {
-	args := []string{action}
+func executable() (string, error) {
+	ext, err := trimOutput("go", "env", "GOEXE")
+	return name + ext, err
+}
+
+func build(output string) error {
+	args := []string{"build", "-o", output}
 	flags, err := buildFlags()
 	if err != nil {
 		return err
 	}
 	args = append(args, flags...)
-	args = append(args, "./cmd/"+name)
+	args = append(args, "./cmd/gobl.verifactu")
 	return sh.RunV("go", args...)
 }
 
