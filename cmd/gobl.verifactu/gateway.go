@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"crypto"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
@@ -23,7 +24,6 @@ import (
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/xmldsig"
 	"github.com/spf13/cobra"
-	"software.sslmate.com/src/go-pkcs12"
 )
 
 const laneGatewayOperationContractVersion = "plazia.compliance.lane-gateway.operation.v1"
@@ -288,14 +288,11 @@ func loadGatewayCertificate(certDER, keyDER []byte) (*xmldsig.Certificate, error
 			return nil, err
 		}
 	}
-	// The upstream signing library accepts PKCS#12 bytes. Keep the
-	// intermediate representation in memory for the lifetime of this call.
-	p12, err := pkcs12.Passwordless.Encode(pair.PrivateKey, cert, nil, "")
-	if err != nil {
-		return nil, err
+	signer, ok := pair.PrivateKey.(crypto.Signer)
+	if !ok {
+		return nil, fmt.Errorf("unsupported private key type")
 	}
-	defer clear(p12)
-	return xmldsig.LoadCertificateFromBytes(p12, "")
+	return xmldsig.NewCertificate(cert, signer)
 }
 
 func readGatewayEnvelope(input io.Reader) (*gobl.Envelope, error) {

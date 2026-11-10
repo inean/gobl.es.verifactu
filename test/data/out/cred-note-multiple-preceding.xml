@@ -83,15 +83,15 @@
                 <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod>
                 <ds:DigestValue>JFcJZHe/0Ut5FUjmY63OvnsOEL3ZY02wYgoWVUBqSDQ=</ds:DigestValue>
               </ds:Reference>
-              <ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#Signature-test-doc-id-SignedProperties">
+              <ds:Reference Type="http://uri.etsi.org/01903#SignedProperties" URI="#xadesSignedProperties">
                 <ds:Transforms>
                   <ds:Transform Algorithm="http://www.w3.org/TR/2001/REC-xml-c14n-20010315"></ds:Transform>
                 </ds:Transforms>
                 <ds:DigestMethod Algorithm="http://www.w3.org/2001/04/xmlenc#sha256"></ds:DigestMethod>
-                <ds:DigestValue>3G92E0NveZL9A2c34x0rlVE3xHJs8HnJ1SN69pM10i8=</ds:DigestValue>
+                <ds:DigestValue>zRGMvpF3qQBBrRYGxH6pt7aqabiORPUIQVZGGwel4LI=</ds:DigestValue>
               </ds:Reference>
             </ds:SignedInfo>
-            <ds:SignatureValue Id="Signature-test-doc-id-SignatureValue">cjBkxZ80XbDsFGRFE0VwPJ+isKiGIYp4LAPIQ0R/1hcsbBVbWsGj1IYQokSU5m3nxnol8Vbamk59LwEr1NG8VFv655jkhz8E5tW1ikIjX9PXj1eEZZ1ZC0EhjPSlPgIUfiLWaeJ0IpiP3kHi6JP0TAkTAS+ta5QxDeVfxyCnUBofkwwCrw5FKjLAUPLT0EiR1+EozpV86QSH4nAI5tkTyTYuKmAZkygEzqHLqNn39rsj9D0v1MKQFLynB6IxDs6TPweyFB2ZPQAkxcnqzTgX3GVikSqk4C5rpusmH0GXnpp2AbkVQ4IQuiS4JhGiNXLpQWow2vz6jvhO1eP15f+rxw==</ds:SignatureValue>
+            <ds:SignatureValue Id="Signature-test-doc-id-SignatureValue">IZzO4PKPjGLKUPw5lfHS5LJhi8a0Z05C0dTpoONkfxhsmGhJunGaUJOSylD6wdsru8wpp+KzULC5XeQd1YQoth2vohDyI912c1KxiCV48uo/XODywRBp2y1p5d1B+5fv7c+1RauPnIVdAdAN5PDF186QJvxmxILWwCvFPkMKtwTioIBu/DhhQ647eRxJicMUwgSOwybsmKYISx28dIqh09hpNIgD9yt1R192494DpOnogqXmgifDvJdKQi+DFpxXdzXDOpmP9sAinzSE9lBwApoqlJ5x7JAIwwylYTvbaDyUgj+VuY+SA2rDXRh3Imq/fJX2MBjTgmqFEbesAXGFEA==</ds:SignatureValue>
             <ds:KeyInfo Id="Certificate-test-doc-id">
               <ds:X509Data>
                 <ds:X509Certificate>MIIC6TCCAdGgAwIBAgIBATANBgkqhkiG9w0BAQsFADAuMREwDwYDVQQKEwhUZXN0IE9yZzEZMBcGA1UEAxMQVGVzdCBDZXJ0aWZpY2F0ZTAeFw0yNDAxMDEwMDAwMDBaFw0zNDAxMDEwMDAwMDBaMC4xETAPBgNVBAoTCFRlc3QgT3JnMRkwFwYDVQQDExBUZXN0IENlcnRpZmljYXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs0D/mPSfSSzpiUWxvqYTLjX/IMNafVpm9/aCRiKq+Hr9MwDaXV/jkXht4gyBs4plnBnitpxKKb1JoB2GkO04hVQN46IpbnwI72MukoxpYTsC8iar1WjC40doVHAQVVpmJbAW2y38xPTNHyo+lW+386Ef+PLmhilqYGpWWU1Cpg0snmGozcPtu8tH2eeeOUjy8UNVPycqYOccAzbvclDSF2Lf3yqynRVIxQzdTpGyVw4qUgUVJi5q1tV56x2Tq2IjvIArcFqHQ7rBO9ZT1PEUKGw3bPrhVcBCFO5dFfw+qCWIIRMlWtVrmpV5OCu57/7lP9PL47FllsxxFuzUDAb0ewIDAQABoxIwEDAOBgNVHQ8BAf8EBAMCB4AwDQYJKoZIhvcNAQELBQADggEBAEnkRyRNGU/Ah6pdJ9O+hVVsqjcP3BNuoj152V6kp+yGMiOMnykIeLD9GjSXRnLy28Top2bLQfcf2jJtJB9hyJYVSvyFkw4jqi/eXAWzQhf5lTnddxaAHR8JnCsd7dp5LI65VNjyRrk3lbz4E3is+oadNIOGx0MtdvENwIN6GU9Tp7FufTHXxHuCf+6Ac/7E7RCdiltlYiYWO4laibIvgwOmimXrPHfOSmET9PfI1H49abl1eVkt75Q3kwIo4Et2iuYz3Qa4svmBt36USivnMJOW1+xGmlwVasXTScWCT2iyAWyR8GJT9afB6PoeQi96n/JMbvLmb3p2/26yzaAqbEE=</ds:X509Certificate>
@@ -105,7 +105,7 @@
             </ds:KeyInfo>
             <ds:Object>
               <xades:QualifyingProperties xmlns:xades="http://uri.etsi.org/01903/v1.3.2#" Id="Signature-test-doc-id-QualifyingProperties" Target="#Signature-test-doc-id-Signature">
-                <xades:SignedProperties Id="Signature-test-doc-id-SignedProperties">
+                <xades:SignedProperties Id="xadesSignedProperties">
                   <xades:SignedSignatureProperties>
                     <xades:SigningTime>2024-11-26T04:00:00+00:00</xades:SigningTime>
                     <xades:SigningCertificate>
