@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"fmt"
 
-	verifactu "github.com/inean/gobl.verifactu"
-	"github.com/inean/xmldsig"
 	"github.com/invopop/gobl"
+	verifactu "github.com/invopop/gobl.es.verifactu"
+	"github.com/invopop/xmldsig"
 	"github.com/spf13/cobra"
 )
 

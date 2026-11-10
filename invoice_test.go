@@ -4,9 +4,9 @@ import (
 	"testing"
 	"time"
 
-	verifactu "github.com/inean/gobl.verifactu"
-	"github.com/inean/gobl.verifactu/test"
-	addon "github.com/invopop/gobl/addons/es/verifactu"
+	verifactu "github.com/invopop/gobl.es.verifactu"
+	"github.com/invopop/gobl.es.verifactu/addon"
+	"github.com/invopop/gobl.es.verifactu/test"
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/gobl/cal"
 	"github.com/invopop/gobl/num"
@@ -83,6 +83,53 @@ func TestNewRegistroAlta(t *testing.T) {
 		assert.Equal(t, "10-01-2022", rectified.FechaExpedicionFactura)
 		assert.Equal(t, "-1620.00", ra.Desglose.DetalleDesglose[0].BaseImponibleOImporteNoSujeto)
 		assert.Equal(t, "-340.20", ra.Desglose.DetalleDesglose[0].CuotaRepercutida)
+		assert.Equal(t, "-340.20", ra.CuotaTotal.String())
+		assert.Equal(t, "-1960.20", ra.ImporteTotal.String())
+	})
+
+	t.Run("should not modify the envelope of rectificative invoices", func(t *testing.T) {
+		env, inv := test.LoadInvoice("cred-note-base.json")
+
+		_, err := vc.RegisterInvoice(env, nil)
+		require.NoError(t, err)
+
+		assert.Equal(t, "20", inv.Lines[0].Quantity.String())
+		assert.Equal(t, "1960.20", inv.Totals.Payable.String())
+	})
+
+	t.Run("should handle rectificative invoices with bypass tag", func(t *testing.T) {
+		env, inv := test.LoadInvoice("cred-note-base.json")
+		inv.SetTags(tax.TagBypass)
+		// Totals that would not survive a recalculation
+		rate := inv.Totals.Taxes.Categories[0].Rates[0]
+		rate.Amount = num.MakeAmount(34021, 2)
+		inv.Totals.Taxes.Categories[0].Amount = rate.Amount
+		inv.Totals.Taxes.Sum = rate.Amount
+		inv.Totals.Tax = rate.Amount
+		inv.Totals.TotalWithTax = num.MakeAmount(196021, 2)
+		inv.Totals.Payable = inv.Totals.TotalWithTax
+
+		ra, err := vc.RegisterInvoice(env, nil)
+		require.NoError(t, err)
+
+		assert.Equal(t, "R1", ra.TipoFactura)
+		assert.Equal(t, "-1620.00", ra.Desglose.DetalleDesglose[0].BaseImponibleOImporteNoSujeto)
+		assert.Equal(t, "-340.21", ra.Desglose.DetalleDesglose[0].CuotaRepercutida)
+		assert.Equal(t, "-340.21", ra.CuotaTotal.String())
+		assert.Equal(t, "-1960.21", ra.ImporteTotal.String())
+		assert.Equal(t, "1960.21", inv.Totals.Payable.String())
+	})
+
+	t.Run("should handle rectificative invoices with rounding", func(t *testing.T) {
+		env, inv := test.LoadInvoice("cred-note-base.json")
+		rounding := num.MakeAmount(-2, 2)
+		inv.Totals.Rounding = &rounding
+		require.NoError(t, env.Calculate())
+		require.Equal(t, "1960.18", inv.Totals.Payable.String())
+
+		ra, err := vc.RegisterInvoice(env, nil)
+		require.NoError(t, err)
+
 		assert.Equal(t, "-340.20", ra.CuotaTotal.String())
 		assert.Equal(t, "-1960.20", ra.ImporteTotal.String())
 	})

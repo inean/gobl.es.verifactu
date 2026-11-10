@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	verifactu "github.com/inean/gobl.verifactu"
-	"github.com/inean/gobl.verifactu/test"
+	verifactu "github.com/invopop/gobl.es.verifactu"
+	"github.com/invopop/gobl.es.verifactu/test"
 	"github.com/invopop/gobl/org"
 	"github.com/invopop/gobl/tax"
 	"github.com/stretchr/testify/assert"

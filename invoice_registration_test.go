@@ -7,6 +7,46 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// AEAT fingerprint specification v0.1.2, sections 6.1–6.3.
+func TestAEATFingerprintChain(t *testing.T) {
+	const (
+		issuer = "89890001K"
+		date   = "01-01-2024"
+		first  = "3C464DAF61ACB827C65FDA19F352A4E3BDC2C640E9E9FC4CC058073F38F12F60"
+		second = "F7B94CFD8924EDFF273501B01EE5153E4CE8F259766F88CF6ACB8935802A2B97"
+		cancel = "177547C0D57AC74748561D054A9CEC14B4C4EA23D1BEFD6F2E69E3A388F90C68"
+	)
+	registration := InvoiceRegistration{
+		IDFactura: &IDFactura{
+			IDEmisorFactura: issuer, NumSerieFactura: "12345678/G33", FechaExpedicionFactura: date,
+		},
+		TipoFactura:              "F1",
+		CuotaTotal:               num.MakeAmount(1235, 2),
+		ImporteTotal:             num.MakeAmount(12345, 2),
+		FechaHoraHusoGenRegistro: "2024-01-01T19:20:30+01:00",
+	}
+	registration.fingerprint(nil)
+	assert.Equal(t, first, registration.Huella)
+	assert.Equal(t, "S", registration.Encadenamiento.PrimerRegistro)
+	previous := registration.ChainData()
+
+	registration.IDFactura.NumSerieFactura = "12345679/G34"
+	registration.FechaHoraHusoGenRegistro = "2024-01-01T19:20:35+01:00"
+	registration.fingerprint(previous)
+	assert.Equal(t, second, registration.Huella)
+	assert.Equal(t, first, registration.Encadenamiento.RegistroAnterior.Huella)
+
+	cancellation := InvoiceCancellation{
+		IDFactura: &IDFacturaAnulada{
+			IDEmisorFactura: issuer, NumSerieFactura: "12345679/G34", FechaExpedicionFactura: date,
+		},
+		FechaHoraHusoGenRegistro: "2024-01-01T19:20:40+01:00",
+	}
+	cancellation.fingerprint(registration.ChainData())
+	assert.Equal(t, cancel, cancellation.Huella)
+	assert.Equal(t, second, cancellation.Encadenamiento.RegistroAnterior.Huella)
+}
+
 func TestInvoiceRegistrationFingerprint(t *testing.T) {
 	t.Run("Alta", func(t *testing.T) {
 		tests := []struct {

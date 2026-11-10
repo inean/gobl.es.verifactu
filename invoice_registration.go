@@ -5,8 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/inean/xmldsig"
-	"github.com/invopop/gobl/addons/es/verifactu"
+	"github.com/invopop/gobl.es.verifactu/addon"
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/gobl/cbc"
 	"github.com/invopop/gobl/currency"
@@ -14,6 +13,7 @@ import (
 	"github.com/invopop/gobl/org"
 	"github.com/invopop/gobl/tax"
 	"github.com/invopop/validation"
+	"github.com/invopop/xmldsig"
 	"github.com/nbio/xml"
 )
 
@@ -136,13 +136,20 @@ type DetalleDesglose struct {
 
 // newInvoiceRegistration creates a new VeriFactu registration for an invoice.
 func newInvoiceRegistration(inv *bill.Invoice, ts time.Time, s *Software) (*InvoiceRegistration, error) {
-	tf, err := getTaxExtKey(inv, verifactu.ExtKeyDocType)
+	tf, err := getTaxExtKey(inv, addon.ExtKeyDocType)
 	if err != nil {
 		return nil, err
 	}
 
+	// In VeriFactu credit notes become "facturas rectificativas por diferencias",
+	// which require negative amounts. These are inverted here from the existing
+	// totals instead of inverting and recalculating the invoice, so that the
+	// source document is left untouched and invoices with the bypass tag
+	// are supported.
+	negate := inv.Type == bill.InvoiceTypeCreditNote
+
 	desc := newDescription(inv)
-	dg, err := newDesglose(inv)
+	dg, err := newDesglose(inv, negate)
 	if err != nil {
 		return nil, err
 	}
@@ -164,13 +171,13 @@ func newInvoiceRegistration(inv *bill.Invoice, ts time.Time, s *Software) (*Invo
 		TipoFactura:                    tf,
 		DescripcionOperacion:           desc,
 		Desglose:                       dg,
-		CuotaTotal:                     inv.Totals.Tax,
-		ImporteTotal:                   inv.Totals.TotalWithTax, // no retained taxes here
+		CuotaTotal:                     signed(inv.Totals.Tax, negate),
+		ImporteTotal:                   signed(inv.Totals.TotalWithTax, negate), // no retained taxes here
 		SistemaInformatico:             s,
 		FechaHoraHusoGenRegistro:       formatDateTimeZone(ts),
 		TipoHuella:                     FingerprintType,
-		FacturaSimplificadaArt7273:     itax.Ext.Get(verifactu.ExtKeySimplifiedArt7273).String(),
-		EmitidaPorTerceroODestinatario: itax.Ext.Get(verifactu.ExtKeyIssuerType).String(),
+		FacturaSimplificadaArt7273:     itax.Ext.Get(addon.ExtKeySimplifiedArt7273).String(),
+		EmitidaPorTerceroODestinatario: itax.Ext.Get(addon.ExtKeyIssuerType).String(),
 	}
 
 	if inv.OperationDate != nil {
@@ -184,7 +191,7 @@ func newInvoiceRegistration(inv *bill.Invoice, ts time.Time, s *Software) (*Invo
 	for _, charge := range inv.Charges {
 		if len(charge.Taxes) == 0 {
 			if !partialBreakdown || charge.Key == bill.ChargeKeyOutlay {
-				reg.ImporteTotal = reg.ImporteTotal.Sub(charge.Amount)
+				reg.ImporteTotal = reg.ImporteTotal.Sub(signed(charge.Amount, negate))
 			}
 		}
 	}
@@ -197,7 +204,7 @@ func newInvoiceRegistration(inv *bill.Invoice, ts time.Time, s *Software) (*Invo
 		}
 	}
 
-	if itax.Ext.Get(verifactu.ExtKeyDocType).In("F2", "R5") {
+	if itax.Ext.Get(addon.ExtKeyDocType).In("F2", "R5") {
 		// The FacturaSinIdentifDestinatarioArt61d field can only be set
 		// if the Document Type is either F2 or R5. Simplified invoices
 		// over a value of 3000€ must have a customer identified.
@@ -208,8 +215,8 @@ func newInvoiceRegistration(inv *bill.Invoice, ts time.Time, s *Software) (*Invo
 		}
 	}
 
-	if inv.Tax.Ext.Get(verifactu.ExtKeyDocType).In(correctiveCodes...) {
-		k, err := getTaxExtKey(inv, verifactu.ExtKeyCorrectionType)
+	if inv.Tax.Ext.Get(addon.ExtKeyDocType).In(correctiveCodes...) {
+		k, err := getTaxExtKey(inv, addon.ExtKeyCorrectionType)
 		if err != nil {
 			return nil, err
 		}
@@ -408,7 +415,7 @@ func hasPartialBreakdownRegime(inv *bill.Invoice) bool {
 			continue
 		}
 		for _, r := range c.Rates {
-			regime := r.Ext.Get(verifactu.ExtKeyRegime).String()
+			regime := r.Ext.Get(addon.ExtKeyRegime).String()
 			for _, sr := range partialBreakdownRegimes {
 				if regime == sr {
 					return true

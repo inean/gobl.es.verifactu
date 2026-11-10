@@ -4,7 +4,7 @@ import (
 	"io"
 	"os"
 
-	verifactu "github.com/inean/gobl.verifactu"
+	verifactu "github.com/invopop/gobl.es.verifactu"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -38,6 +38,7 @@ func (o *rootOpts) cmd() *cobra.Command {
 	cmd.AddCommand(send(o).cmd())
 	cmd.AddCommand(convert(o).cmd())
 	cmd.AddCommand(cancel(o).cmd())
+	cmd.AddCommand(gateway(o).cmd())
 
 	return cmd
 }

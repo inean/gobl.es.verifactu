@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"time"
 
-	noverifactu "github.com/inean/gobl.verifactu/pkg/noverifactu"
-	"github.com/inean/xmldsig"
 	"github.com/invopop/gobl"
-	"github.com/invopop/gobl/addons/es/verifactu"
+	"github.com/invopop/gobl.es.verifactu/addon"
 	"github.com/invopop/gobl/bill"
 	"github.com/invopop/gobl/cbc"
 	"github.com/invopop/gobl/head"
 	"github.com/invopop/gobl/l10n"
 	"github.com/invopop/gobl/org"
+	"github.com/invopop/gobl/rules"
+	"github.com/invopop/xmldsig"
 )
 
 const (
@@ -25,36 +25,26 @@ const (
 
 // Client provides the main interface to the VeriFactu package.
 type Client struct {
-	software Software
-	env      Environment
-	rep      *Issuer
-	curTime  time.Time
-	cert     *xmldsig.Certificate
-	certDER  []byte
-	keyDER   []byte
-	conn     *connection
-	withSeal bool
-	signing  bool
-	signOpts []xmldsig.Option
+	software    Software
+	env         Environment
+	rep         *Issuer
+	curTime     time.Time
+	cert        *xmldsig.Certificate
+	conn        *connection
+	withSeal    bool
+	signing     bool
+	signOpts    []xmldsig.Option
+	noVerifactu bool
 }
 
 // Option is used to configure the client.
 type Option func(*Client)
 
-// WithCertificate defines the certificate to use for XML signatures and TLS
-// authentication.
+// WithCertificate defines the signing certificate to use when producing the
+// VeriFactu document.
 func WithCertificate(cert *xmldsig.Certificate) Option {
 	return func(c *Client) {
 		c.cert = cert
-	}
-}
-
-// WithCertificateDER defines the DER-encoded certificate and private key to use
-// for XML signatures and TLS authentication.
-func WithCertificateDER(certificateDER, privateKeyDER []byte) Option {
-	return func(c *Client) {
-		c.certDER = certificateDER
-		c.keyDER = privateKeyDER
 	}
 }
 
@@ -100,6 +90,16 @@ var WithCorporateSeal Option = func(c *Client) {
 	c.withSeal = true
 }
 
+// NoVerifactu configures the client for a NO VERI*FACTU invoicing system. Records in NO
+// VERI*FACTU systems must be signed, so this option also enables signing; use WithSigning
+// to pass additional signing options if needed.
+func NoVerifactu() Option {
+	return func(c *Client) {
+		c.noVerifactu = true
+		c.signing = true
+	}
+}
+
 // WithSigning sets additional xmldsig options that will be passed
 // through to SignDocument for each record. This is useful for controlling
 // the document ID and signing time in tests.
@@ -121,14 +121,6 @@ func New(software Software, opts ...Option) (*Client, error) {
 
 	for _, opt := range opts {
 		opt(c)
-	}
-
-	if len(c.certDER) > 0 || len(c.keyDER) > 0 {
-		var err error
-		c.cert, err = xmldsig.LoadCertificateFromDER(c.certDER, c.keyDER)
-		if err != nil {
-			return nil, ErrValidation.WithMessage(fmt.Errorf("preparing DER certificate: %v", err).Error())
-		}
 	}
 
 	if c.cert == nil {
@@ -225,13 +217,6 @@ func (c *Client) RegisterInvoice(env *gobl.Envelope, prev *ChainData, opts ...Ge
 		return nil, ErrNotSpanish
 	}
 
-	if inv.Type == bill.InvoiceTypeCreditNote {
-		// In VeriFactu credit notes become "facturas rectificativas por diferencias",
-		// which require negative totals.
-		if err := inv.Invert(); err != nil {
-			return nil, err
-		}
-	}
 	software := c.software // clone
 	if o.installNumber != "" {
 		software.NumeroInstalacion = o.installNumber
@@ -362,7 +347,13 @@ func (c *Client) RegisterEvent(env *gobl.Envelope, prev *EventChainData, opts ..
 		return nil, ErrNotSpanish
 	}
 
-	if err := noverifactu.Validate(status); err != nil {
+	// The status rules are registered against the addon, so they only apply
+	// when the document declares it. Check explicitly rather than converting a
+	// document that silently skipped validation.
+	if !addon.V1.In(status.GetAddons()...) {
+		return nil, ErrValidation.WithMessage("missing '" + addon.V1.String() + "' addon")
+	}
+	if err := rules.Validate(status); err != nil {
 		return nil, err
 	}
 
@@ -403,9 +394,9 @@ func (c *Client) addEventStamps(env *gobl.Envelope, reg *EventRegistration) {
 // addRegistrationStamps adds the QR code stamp and Hash to the envelope.
 func (c *Client) addRegistrationStamps(env *gobl.Envelope, reg *InvoiceRegistration) {
 	// now generate the QR codes and add them to the envelope
-	code := reg.generateURL(c.env == EnvironmentProduction)
+	code := reg.generateURL(c.env == EnvironmentProduction, c.noVerifactu)
 	env.Head.AddStamp(&head.Stamp{
-		Provider: verifactu.StampQR,
+		Provider: addon.StampQR,
 		Value:    code,
 	})
 	env.Head.AddStamp(&head.Stamp{

@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/inean/gobl.verifactu/test"
+	"github.com/invopop/gobl.es.verifactu/test"
 	"github.com/invopop/gobl/num"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -184,4 +184,21 @@ func TestCancelInvoiceWithSigning(t *testing.T) {
 	data, err := can.Bytes()
 	require.NoError(t, err)
 	assert.Contains(t, string(data), "<ds:Signature")
+}
+
+func TestRegisterInvoiceNoVerifactuImpliesSigning(t *testing.T) {
+	ts, err := time.Parse(time.RFC3339, "2024-11-26T04:00:00Z")
+	require.NoError(t, err)
+
+	c, err := New(Software{},
+		WithCurrentTime(ts),
+		WithCertificate(test.Certificate(t)),
+		NoVerifactu(),
+	)
+	require.NoError(t, err)
+
+	env := test.LoadEnvelope("inv-base.json")
+	reg, err := c.RegisterInvoice(env, nil)
+	require.NoError(t, err)
+	require.NotNil(t, reg.Signature)
 }

@@ -4,7 +4,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/inean/gobl.verifactu/test"
+	"github.com/invopop/gobl.es.verifactu/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

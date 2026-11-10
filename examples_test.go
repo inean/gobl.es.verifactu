@@ -8,11 +8,11 @@ import (
 	"testing"
 	"time"
 
-	verifactu "github.com/inean/gobl.verifactu"
-	"github.com/inean/gobl.verifactu/test"
+	verifactu "github.com/invopop/gobl.es.verifactu"
+	"github.com/invopop/gobl.es.verifactu/test"
 
-	"github.com/inean/xmldsig"
 	"github.com/invopop/gobl/bill"
+	"github.com/invopop/xmldsig"
 	"github.com/lestrrat-go/libxml2/xsd"
 	"github.com/stretchr/testify/require"
 )
